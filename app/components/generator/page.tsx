@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { emojis } from '../../lib/translations';
+import confetti from 'canvas-confetti';
 
 export default function Generator() {
     const { t } = useLanguage();
@@ -16,18 +17,66 @@ export default function Generator() {
 
     const [currentCongratulation, setCurrentCongratulation] = useState<typeof congratulations[0] | null>(null);
     const [isAnimating, setIsAnimating] = useState(false);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
     useEffect(() => {
         setCurrentCongratulation(null);
     }, [t]);
 
     const generateCongratulation = () => {
+        if (isButtonDisabled) return;
+
         setIsAnimating(true);
+        setIsButtonDisabled(true); // Disable button
+
+        // Confetti effect on button click
+        const count = 200;
+        const defaults = {
+            origin: { y: 0.7 },
+            colors: ['#ff6b9d', '#c44569', '#f8b500', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9ff3'],
+        };
+
+        function fire(particleRatio: number, opts: confetti.Options) {
+            confetti({
+                ...defaults,
+                ...opts,
+                particleCount: Math.floor(count * particleRatio),
+            });
+        }
+
+        // Multiple confetti bursts
+        fire(0.25, {
+            spread: 26,
+            startVelocity: 55,
+        });
+        fire(0.2, {
+            spread: 60,
+        });
+        fire(0.35, {
+            spread: 100,
+            decay: 0.91,
+            scalar: 0.8,
+        });
+        fire(0.1, {
+            spread: 120,
+            startVelocity: 25,
+            decay: 0.92,
+            scalar: 1.2,
+        });
+        fire(0.1, {
+            spread: 120,
+            startVelocity: 45,
+        });
 
         setTimeout(() => {
             const randomIndex = Math.floor(Math.random() * congratulations.length);
             setCurrentCongratulation(congratulations[randomIndex]);
             setIsAnimating(false);
+            
+            // Re-enable button after 2 seconds
+            setTimeout(() => {
+                setIsButtonDisabled(false);
+            }, 2000); 
         }, 300);
     };
 
@@ -45,7 +94,9 @@ export default function Generator() {
 
                 <button
                     onClick={generateCongratulation}
-                    className="group relative px-8 md:px-12 py-4 md:py-6 bg-gradient-to-r from-pink-500 via-purple-500 to-rose-500 text-white font-playfair text-xl md:text-2xl lg:text-3xl font-bold rounded-full shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 hover:scale-110 hover:from-pink-600 hover:via-purple-600 hover:to-rose-600 transform active:scale-95"
+                    disabled={isButtonDisabled}
+                    className={`group relative px-8 md:px-12 py-4 md:py-6 bg-gradient-to-r from-pink-500 via-purple-500 to-rose-500 text-white font-playfair text-xl md:text-2xl lg:text-3xl font-bold rounded-full shadow-2xl transition-all duration-300 transform active:scale-95
+                        ${isButtonDisabled ? 'opacity-50 cursor-not-allowed scale-95' : 'hover:shadow-pink-500/50 hover:scale-110 hover:from-pink-600 hover:via-purple-600 hover:to-rose-600'}`}
                 >
                     <span className="relative z-10 flex items-center gap-3">
                         <span>{t.generator.button}</span>
