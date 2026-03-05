@@ -3,7 +3,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { emojis } from '../../lib/translations';
-import confetti from 'canvas-confetti';
 
 export default function Generator() {
     const { t } = useLanguage();
@@ -23,11 +22,14 @@ export default function Generator() {
         setCurrentCongratulation(null);
     }, [t]);
 
-    const generateCongratulation = () => {
+    const generateCongratulation = async () => {
         if (isButtonDisabled) return;
 
         setIsAnimating(true);
         setIsButtonDisabled(true); // Disable button
+
+        // Dynamically import confetti
+        const confetti = (await import('canvas-confetti')).default;
 
         // Confetti effect on button click
         const count = 200;
@@ -36,7 +38,7 @@ export default function Generator() {
             colors: ['#ff6b9d', '#c44569', '#f8b500', '#ff9ff3', '#54a0ff', '#5f27cd', '#00d2d3', '#ff9ff3'],
         };
 
-        function fire(particleRatio: number, opts: confetti.Options) {
+        function fire(particleRatio: number, opts: any) {
             confetti({
                 ...defaults,
                 ...opts,
