@@ -48,7 +48,7 @@ export default function Greetings() {
             {greetings.map((greeting, index) => (
                 <div
                     key={`${greeting.emoji}-${index}`}
-                    ref={(el) => (cardRefs.current[index] = el)}
+                    ref={(el) => { cardRefs.current[index] = el; }}
                     className="min-h-screen snap-start snap-always flex items-center justify-center px-4 sm:px-6 md:px-10 py-20 relative bg-gradient-to-br from-pink-200 via-purple-100 to-rose-200"
                 >
                     <div
